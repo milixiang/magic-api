@@ -337,6 +337,12 @@ public class NamedTable extends Attributes<Object> {
 	@Comment("批量插入")
 	public int batchInsert(RuntimeContext runtimeContext,
 						   @Comment(name = "collection", value = "各项列和值") Collection<Map<String, Object>> collection, @Comment("batchSize") int batchSize) {
+		preHandle(SqlMode.INSERT);
+		collection.forEach(item -> {
+			this.columns = item;
+			preHandle(SqlMode.INSERT);
+			this.columns = null;
+		});
 		Set<String> keys = collection.stream().flatMap(it -> it.keySet().stream()).collect(Collectors.toSet());
 		if (keys.isEmpty()) {
 			throw new MagicAPIException("要插入的列不能为空");
